@@ -61,6 +61,9 @@
       </div>
       <i @touchstart="touchstart" @touchmove="touchmove"></i>
     </div>
+    <div class="position-icon" @click="moveCenter" v-show="!line_detail_modal_class_name">
+      <img src="@/static/images/icon_location@2x.png" alt="" />
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -74,7 +77,7 @@ import {
   InitData,
   initDataFn,
   text_style,
-  img_style,
+  // img_style,
   box_style,
   infoWindowStyle,
   StreetData,
@@ -100,6 +103,15 @@ export default class Index extends Vue {
   line_detail_modal_class_name: string = ""; // 路线详情模态窗的类名
   active_town: number = 0; // 当前选中的城镇
   filter_point: PointBos[] = []; // 底部列表中的点位;
+  img_style: string = "margin: 0 auto 1.067vw;";
+
+  // 定位到当前位置
+  moveCenter() {
+    const lng = sessionStorage.getItem("lng");
+    const lat = sessionStorage.getItem("lat");
+    this.map.setCenter([lng, lat]);
+  }
+
   // 初始化地图
   async initMap() {
     this.AMap = await AMapLoader.load({
@@ -113,7 +125,7 @@ export default class Index extends Vue {
         this.init_data.scenicBO.longitude,
         this.init_data.scenicBO.latitude,
       ],
-      // zooms: [this.scenic_data.minZoom, this.scenic_data.maxZoom],
+      zooms: [this.init_data.scenicBO.minZoom, this.init_data.scenicBO.maxZoom],
     });
   }
   // 点击底部菜单
@@ -134,17 +146,16 @@ export default class Index extends Vue {
       {
         gridSize: 60,
         renderMarker: function (context: any) {
-          context.marker.setOffset(new that.AMap.Pixel(-36, -33));
           context.marker.setContent(that.getMarkerDom(context).marker_content);
+          context.marker.setOffset(new that.AMap.Pixel(-36, -33));
           context.marker.on("click", function () {
             that.active_marker = context.data[0].data;
-
             that.getInfowWindowDom(context.data[0].data);
-            that.clickMarker(context);
             that.info_window.open(that.map, [
               context.data[0].data.longitude,
               context.data[0].data.latitude,
             ]);
+            that.clickMarker(context);
           });
         },
         renderClusterMarker: function (context: any) {
@@ -222,16 +233,6 @@ export default class Index extends Vue {
     this.cluster_marker_list.forEach((item: any) => {
       item.data.markIcon = item.data.copy_markIcon;
     });
-    {
-      // 此处代码是由于当更改全部marker icon后,数据不更新,只有当更改地图经纬度或者更改地图的zoom等级才会重新渲染数据;
-      // 因此此处修改一下地图的center然后再修改回来,从而达到更新数据,并且不会在视觉上有任何效果
-      const { lng, lat } = this.map.getCenter();
-      this.map.setCenter([
-        this.map.getCenter().lng - 0.00001,
-        this.map.getCenter().lat,
-      ]);
-      this.map.setCenter([lng, lat]);
-    }
     context.data[0].data.markIcon = context.data[0].data.markSelectIcon;
     context.marker.setContent(this.getMarkerDom(context).active_marker_content);
   }
@@ -259,7 +260,7 @@ export default class Index extends Vue {
           )[0]?.icon,
           markSelectIcon: this.init_data.pointTypeBOS.filter(
             (point_type_item: any) => point_type_item.id === item.pointTypeId
-          )[0]?.icon,
+          )[0]?.iconIn,
           color: this.init_data.pointTypeBOS.filter(
             (point_type_item: any) => point_type_item.id === item.pointTypeId
           )[0]?.color,
@@ -275,16 +276,16 @@ export default class Index extends Vue {
       active_marker_content: "",
     };
     obj.marker_content = `<div style="${box_style}">
-            <img style="${img_style}" src='${this.base_url}${context?.data[0]?.data.markIcon}'/>
+            <img style="${this.img_style};width: 32px;height: 37px;" src='${this.base_url}${context?.data[0]?.data.markIcon}'/>
             <div style="${text_style};color:${context?.data[0]?.data.color}">${context?.data[0]?.data.name}</div>
           </div>`;
     obj.active_marker_content = `<div style="${box_style}">
-              <img style="${img_style}" src='${this.base_url}${context?.data[0]?.data.markIcon}'/>
+              <img style="margin: 0 auto 1.067vw;width: 32px;height: 37px;" src='${this.base_url}${context?.data[0]?.data.markIcon}'/>
               <div style="${text_style};color:${context?.data[0]?.data.color}">${context?.data[0]?.data.name}</div>
             </div>`;
     if (is_cluster_marker) {
       obj.cluster_marker_content = `<div style="${box_style}">
-            <img style="${img_style}" src='${this.base_url}${context.data.markIcon}'/>
+            <img style="${this.img_style}width: 32px;height: 37px;" src='${this.base_url}${context.data.markIcon}'/>
             <div style="${text_style};color:${context.data.color}">${context.data.name}</div>
           </div>`;
     }
@@ -398,8 +399,12 @@ export default class Index extends Vue {
     (window as any).jumpDetail = this.jumpDetail;
     (window as any).jumpMap = this.jumpMap;
   }
-  closeWindow() {
+  async closeWindow() {
     this.info_window.close();
+    this.cluster_marker_list = [];
+    this.cluster.setData();
+    this.getClusterMarkerList();
+    await this.showMarker();
   }
   // 跳转到详情页
   jumpDetail() {
@@ -466,6 +471,24 @@ export default class Index extends Vue {
 <style lang="less" scoped>
 #index {
   position: relative;
+  .position-icon {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    opacity: 0.96;
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 142px;
+    right: 16px;
+    z-index: 1;
+    img {
+      width: 22px;
+      height: 22px;
+    }
+  }
   .bottom-menu {
     transition: all 0.3s;
     position: absolute;

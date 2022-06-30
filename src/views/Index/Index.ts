@@ -73,7 +73,7 @@ export function initDataFn(res?: InitData) {
 export const box_style =
   "width: 19.2vw;height: 17.6vw;display: flex;flex-direction: column;justify-content: space-between";
 export const img_style =
-  "width: 8.533vw;height: 9.867vw;margin: 0 auto 1.067vw;";
+  "margin: 0 auto 1.067vw;";
 export const text_style =
   "white-space:nowrap;font-size: 3.733vw;line-height: 6.667vw;text-align: center;";
 export const infoWindowStyle: string = `width: 62.933vw;height: 18.133vw;position:relative;display: flex;flex-direction: row;background: red;background: white;padding: 2.133vw;border-radius: 1.067vw;`;
