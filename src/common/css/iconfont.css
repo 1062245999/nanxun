@@ -1,0 +1,106 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 2820949 */
+  src: url('//at.alicdn.com/t/font_2820949_1fgb9p4faq5h.woff2?t=1643075891188') format('woff2'),
+       url('//at.alicdn.com/t/font_2820949_1fgb9p4faq5h.woff?t=1643075891188') format('woff'),
+       url('//at.alicdn.com/t/font_2820949_1fgb9p4faq5h.ttf?t=1643075891188') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-icon_share1:before {
+  content: "\e687";
+}
+
+.icon-icon_list:before {
+  content: "\e63b";
+}
+
+.icon-icon_map:before {
+  content: "\e63a";
+}
+
+.icon-icon_nav:before {
+  content: "\e637";
+}
+
+.icon-icon_location:before {
+  content: "\e636";
+}
+
+.icon-icon_window_close:before {
+  content: "\e635";
+}
+
+.icon-button_s_close:before {
+  content: "\e634";
+}
+
+.icon-icon_y_up:before {
+  content: "\e631";
+}
+
+.icon-icon_search:before {
+  content: "\e632";
+}
+
+.icon-icon_menu:before {
+  content: "\e633";
+}
+
+.icon-failure:before {
+  content: "\e62f";
+}
+
+.icon-succeed:before {
+  content: "\e630";
+}
+
+.icon-icon_guide:before {
+  content: "\e62d";
+}
+
+.icon-icon_camera:before {
+  content: "\e62e";
+}
+
+.icon-icon_next:before {
+  content: "\e62c";
+}
+
+.icon-icon_scenic:before {
+  content: "\e62b";
+}
+
+.icon-icon_time:before {
+  content: "\e62a";
+}
+
+.icon-icon_ahead:before {
+  content: "\e623";
+}
+
+.icon-icon_share:before {
+  content: "\e624";
+}
+
+.icon-icon_vr:before {
+  content: "\e626";
+}
+
+.icon-icon_place:before {
+  content: "\e627";
+}
+
+.icon-icon_play:before {
+  content: "\e628";
+}
+
+.icon-icon_address:before {
+  content: "\e629";
+}
