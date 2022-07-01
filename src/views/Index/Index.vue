@@ -44,16 +44,49 @@
             :key="index"
             @click="clickPoint(item)"
           >
-            <img :src="base_url + item.pic" />
+            <img :src="base_url + item.pic" v-if="item.isDetails" />
             <div class="info">
-              <p>{{ item.name }}</p>
+              <p
+                :class="{
+                  'blue-color': active_marker
+                    ? item.id === active_marker.id
+                    : '',
+                }"
+              >
+                {{ item.name }}
+              </p>
+              <p
+                v-if="!item.isDetails"
+                :class="{
+                  'blue-color': active_marker
+                    ? item.id === active_marker.id
+                    : '',
+                }"
+                style="margin-top: 8px"
+              >
+                距您{{ item.distance }}
+              </p>
               <p>
-                <img
-                  v-if="item.isDetails"
-                  src="../../static/images/icon_address@2x.png"
-                  alt=""
-                />
-                <span>{{ item.address }}</span>
+                <template v-if="item.isDetails">
+                  <img
+                    v-if="item.id === (active_marker ? active_marker.id : '')"
+                    src="../../static/images/icon_address_se@2x.png"
+                    alt=""
+                  />
+                  <img
+                    v-else
+                    src="../../static/images/icon_address@2x.png"
+                    alt=""
+                  />
+                </template>
+                <span
+                  :class="{
+                    'blue-color': active_marker
+                      ? item.id === active_marker.id
+                      : '',
+                  }"
+                  >{{ item.address }}</span
+                >
               </p>
             </div>
           </div>
@@ -61,7 +94,11 @@
       </div>
       <i @touchstart="touchstart" @touchmove="touchmove"></i>
     </div>
-    <div class="position-icon" @click="moveCenter" v-show="!line_detail_modal_class_name">
+    <div
+      class="position-icon"
+      @click="moveCenter"
+      v-show="!line_detail_modal_class_name"
+    >
       <img src="@/static/images/icon_location@2x.png" alt="" />
     </div>
   </div>
@@ -77,7 +114,6 @@ import {
   InitData,
   initDataFn,
   text_style,
-  // img_style,
   box_style,
   infoWindowStyle,
   StreetData,
@@ -220,12 +256,20 @@ export default class Index extends Vue {
     }
   }
   // 点击底部弹窗的景点
-  clickPoint(item: PointBos) {
+  async clickPoint(item: PointBos) {
     this.map.setZoomAndCenter(this.init_data.scenicBO.maxZoom, [
       item.longitude,
       item.latitude,
     ]);
     this.map.panBy(0, -150);
+    this.active_marker = this.cluster_marker_list.filter((item2: any) => {
+      return item2.data.id === item.id;
+    })[0].data;
+    this.getInfowWindowDom(this.active_marker);
+    this.info_window.open(this.map, [
+      this.active_marker.longitude,
+      this.active_marker.latitude,
+    ]);
   }
   // 当点击地图上的marker点位时
   clickMarker(context: any) {
@@ -276,16 +320,16 @@ export default class Index extends Vue {
       active_marker_content: "",
     };
     obj.marker_content = `<div style="${box_style}">
-            <img style="${this.img_style};width: 32px;height: 37px;" src='${this.base_url}${context?.data[0]?.data.markIcon}'/>
+            <img style="${this.img_style};width: 40px;height: 45px;" src='${this.base_url}${context?.data[0]?.data.markIcon}'/>
             <div style="${text_style};color:${context?.data[0]?.data.color}">${context?.data[0]?.data.name}</div>
           </div>`;
     obj.active_marker_content = `<div style="${box_style}">
-              <img style="margin: 0 auto 1.067vw;width: 32px;height: 37px;" src='${this.base_url}${context?.data[0]?.data.markIcon}'/>
+              <img style="margin: 0 auto 1.067vw;width: 40px;height: 45px;" src='${this.base_url}${context?.data[0]?.data.markIcon}'/>
               <div style="${text_style};color:${context?.data[0]?.data.color}">${context?.data[0]?.data.name}</div>
             </div>`;
     if (is_cluster_marker) {
       obj.cluster_marker_content = `<div style="${box_style}">
-            <img style="${this.img_style}width: 32px;height: 37px;" src='${this.base_url}${context.data.markIcon}'/>
+            <img style="${this.img_style}width: 40px;height: 45px;" src='${this.base_url}${context.data.markIcon}'/>
             <div style="${text_style};color:${context.data.color}">${context.data.name}</div>
           </div>`;
     }
@@ -471,6 +515,9 @@ export default class Index extends Vue {
 <style lang="less" scoped>
 #index {
   position: relative;
+  .blue-color {
+    color: #3e68ff !important;
+  }
   .position-icon {
     position: absolute;
     width: 32px;
@@ -596,6 +643,7 @@ export default class Index extends Vue {
         .scenic-item {
           display: flex;
           margin-bottom: 12px;
+          padding-left: 8px;
           > img {
             width: 80px;
             height: 60px;
