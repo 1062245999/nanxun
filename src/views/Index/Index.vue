@@ -172,6 +172,7 @@ export default class Index extends Vue {
     if (index === 0) {
       this.line_detail_modal_class_name = "";
     }
+    this.info_window.close();
   }
   // 通过点聚合渲染marker点
   async showMarker() {
