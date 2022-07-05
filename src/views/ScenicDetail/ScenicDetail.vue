@@ -27,7 +27,7 @@
       />
     </div>
     <div class="info">
-      <p>景区介绍</p>
+      <p>详情介绍</p>
       <p class="detail-text" v-html="scenic_detail.pointInfo"></p>
       <img
         :src="base_url + (scenic_detail.img[0] ? scenic_detail.img[0].pic : '')"
