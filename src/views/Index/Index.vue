@@ -2,91 +2,53 @@
   <div class="component" id="index">
     <div :class="['bottom-menu', line_detail_modal_class_name]">
       <div @touchstart="touchstart" @touchmove="touchmove">
-        <div
-          v-for="(item, index) in init_data.pointTypeBOS"
-          :key="index"
-          @click="clickMenuItem(index)"
-          :class="{
-            'menu-item': true,
-            'active-menu-item': active_menu === index,
-          }"
-        >
+        <div v-for="(item, index) in init_data.pointTypeBOS" :key="index" @click="clickMenuItem(index)" :class="{
+          'menu-item': true,
+          'active-menu-item': active_menu === index,
+        }">
           <i>
-            <img
-              :src="base_url + (active_menu === index ? item.picIn : item.pic)"
-              alt=""
-              v-if="index !== 0"
-            />
-            <img
-              v-else
-              :src="active_menu === index ? item.picIn : item.pic"
-              alt=""
-            />
+            <img :src="base_url + (active_menu === index ? item.picIn : item.pic)" alt="" v-if="index !== 0" />
+            <img v-else :src="active_menu === index ? item.picIn : item.pic" alt="" />
           </i>
           <span>{{ item.name }}</span>
         </div>
       </div>
       <div>
         <div class="left">
-          <div
-            v-for="(item, index) in street_data"
-            :key="index"
-            :class="{ town: true, 'town-active': active_town === index }"
-            @click="changeTown(index)"
-          >
+          <div v-for="(item, index) in street_data" :key="index"
+            :class="{ town: true, 'town-active': active_town === index }" @click="changeTown(index)">
             {{ item.name }}
           </div>
         </div>
         <div class="right">
-          <div
-            class="scenic-item"
-            v-for="(item, index) in filter_point"
-            :key="index"
-            @click="clickPoint(item)"
-          >
+          <div class="scenic-item" v-for="(item, index) in filter_point" :key="index" @click="clickPoint(item)">
             <img :src="base_url + item.pic" v-if="item.isDetails" />
             <div class="info">
-              <p
-                :class="{
-                  'blue-color': active_marker
-                    ? item.id === active_marker.id
-                    : '',
-                }"
-              >
+              <p :class="{
+                'blue-color': active_marker
+                  ? item.id === active_marker.id
+                  : '',
+              }">
                 {{ item.name }}
               </p>
-              <p
-                v-if="!item.isDetails"
-                :class="{
-                  'blue-color': active_marker
-                    ? item.id === active_marker.id
-                    : '',
-                }"
-                style="margin-top: 8px"
-              >
+              <p v-if="!item.isDetails" :class="{
+                'blue-color': active_marker
+                  ? item.id === active_marker.id
+                  : '',
+              }" style="margin-top: 8px">
                 距您{{ item.distance }}
               </p>
               <p>
                 <template v-if="item.isDetails">
-                  <img
-                    v-if="item.id === (active_marker ? active_marker.id : '')"
-                    src="../../static/images/icon_address_se@2x.png"
-                    alt=""
-                  />
-                  <img
-                    v-else
-                    src="../../static/images/icon_address@2x.png"
-                    alt=""
-                  />
+                  <img v-if="item.id === (active_marker ? active_marker.id : '')"
+                    src="../../static/images/icon_address_se@2x.png" alt="" />
+                  <img v-else src="../../static/images/icon_address@2x.png" alt="" />
                 </template>
-                <span
-                  :class="{
-                    'blue-color': active_marker
-                      ? item.id === active_marker.id
-                      : '',
-                  }"
-                  >{{ item.address }}</span
-                >
+                <span :class="{
+                  'blue-color': active_marker
+                    ? item.id === active_marker.id
+                    : '',
+                }">{{ item.address }}</span>
               </p>
             </div>
           </div>
@@ -94,11 +56,7 @@
       </div>
       <i @touchstart="touchstart" @touchmove="touchmove"></i>
     </div>
-    <div
-      class="position-icon"
-      @click="moveCenter"
-      v-show="!line_detail_modal_class_name"
-    >
+    <div class="position-icon" @click="moveCenter" v-show="!line_detail_modal_class_name">
       <img src="@/static/images/icon_location@2x.png" alt="" />
     </div>
   </div>
@@ -140,7 +98,8 @@ export default class Index extends Vue {
   active_town: number = 0; // 当前选中的城镇
   filter_point: PointBos[] = []; // 底部列表中的点位;
   img_style: string = "margin: 0 auto 1.067vw;";
-
+  water_line_list: any = []; // 含有水流路线的水域列表
+  water_line_layer_list: any = []; // 水流polyLine列表
   // 定位到当前位置
   moveCenter() {
     const lng = sessionStorage.getItem("lng");
@@ -161,7 +120,7 @@ export default class Index extends Vue {
         this.init_data.scenicBO.longitude,
         this.init_data.scenicBO.latitude,
       ],
-      zooms: [this.init_data.scenicBO.minZoom, this.init_data.scenicBO.maxZoom],
+      // zooms: [this.init_data.scenicBO.minZoom, this.init_data.scenicBO.maxZoom],
     });
   }
   // 点击底部菜单
@@ -348,37 +307,32 @@ export default class Index extends Vue {
       this.info_window.setContent(
         `<div style="${infoWindowStyle}">
           <img src='${close_icon}' style="position: absolute;right: 4px;top: 1.067px;width: 20px;height: 20px;" onclick="closeWindow()"/>
-          <img src="${this.base_url}${
-          this.active_marker.pic
+          <img src="${this.base_url}${this.active_marker.pic
         }"  style="width: 56px;height: 56px;border-radius: 2px;margin-right: 8px;"/>
           <div style="display: flex;flex-direction: column;justify-content:space-between;">
-            <p style="margin-bottom: 4px;text-align: left;font-size: 14;font-weight: 500;color: #444">${
-              this.active_marker.name
-            }</p>
+            <p style="margin-bottom: 4px;text-align: left;font-size: 14;font-weight: 500;color: #444">${this.active_marker.name
+        }</p>
             <p style="font-size: 12px;color: #848484;text-align: left;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden;">${this.active_marker.synopsis.slice(
-              0,
-              19
-            )}${
-          this.active_marker.synopsis ? "..." : ""
+          0,
+          19
+        )}${this.active_marker.synopsis ? "..." : ""
         }<span onclick="jumpDetail()" style="color: #3E68FF">查看详情<img style="width: 16px;height: 16px;vertical-align: middle;display: inline-block;" src="${arrow_icon}"/></span></p>
           </div>
         </div>`
       );
       this.info_window.setOffset(new this.AMap.Pixel(0, -40));
     } else {
-      this.info_window.setContent(`<div onclick="jumpMap(${
-        this.active_marker.longitude
-      },
+      this.info_window.setContent(`<div onclick="jumpMap(${this.active_marker.longitude
+        },
         ${this.active_marker.latitude},
         '${this.active_marker.name}'
       )" style="display: flex;flex-direction: column;width: 80px;height: 60px;background: white;border-radius: 4px;padding: 6px 8px;">
         <div style="display: flex;flex-direction: row;width: 64px;height: 28px;background: #3E68FF;border-radius: 4px;align-items: center;justify-content: center;">
           <img style="width:16px;height: 16px;" src="${nav_icon}"/>
-          <span style="color: white" onclick="jumpMap(${
-            (this.active_marker.longitude,
-            this.active_marker.latitude,
-            this.active_marker.name)
-          })">导航</span>
+          <span style="color: white" onclick="jumpMap(${(this.active_marker.longitude,
+          this.active_marker.latitude,
+          this.active_marker.name)
+        })">导航</span>
         </div>
         <span style="font-size: 12px;color: #848484;margin-top: 6px;">距您123km</span>
       </div>`);
@@ -403,6 +357,32 @@ export default class Index extends Vue {
     this.cluster.setData();
     this.getClusterMarkerList();
     await this.showMarker();
+    // 如果当前选中的active-menu为7，也就是水域，那么就在地图上绘制线形覆盖物
+    if (this.active_menu === 7) {
+      this.water_line_list.forEach((water_line_item: any) => {
+        const line_path = water_line_item.waterBOS?.map((item: any) => {
+          return [item.longitude, item.latitude];
+        });
+        var polyline = new this.AMap.Polyline({
+          path: line_path,
+          isOutline: true,
+          outlineColor: 'white',
+          borderWeight: 3,
+          strokeColor: "#4A93FF",
+          strokeOpacity: 1,
+          strokeWeight: 6,
+          // 折线样式还支持 'dashed'
+          strokeStyle: "solid",
+          lineJoin: 'round',
+          lineCap: 'round',
+          zIndex: 50,
+        });
+        this.water_line_layer_list.push(polyline);
+      });
+      this.map.add(this.water_line_layer_list);
+    } else {
+      this.map.remove(this.water_line_layer_list);
+    }
     this.map.setFitView(null, false, [50, 100, 150, 60]);
   }
   async touchmove(e: any) {
@@ -429,6 +409,7 @@ export default class Index extends Vue {
       picIn: all_icon_select,
       name: "全部",
     } as any);
+    this.water_line_list = this.init_data.pointBOS.filter((item: any) => item.waterBOS?.length > 0);
     await this.initMap();
     await this.getGeolocation();
     this.init_data.pointBOS.forEach((item: any) => {
@@ -516,9 +497,11 @@ export default class Index extends Vue {
 <style lang="less" scoped>
 #index {
   position: relative;
+
   .blue-color {
     color: #3e68ff !important;
   }
+
   .position-icon {
     position: absolute;
     width: 32px;
@@ -532,11 +515,13 @@ export default class Index extends Vue {
     bottom: 142px;
     right: 16px;
     z-index: 1;
+
     img {
       width: 22px;
       height: 22px;
     }
   }
+
   .bottom-menu {
     transition: all 0.3s;
     position: absolute;
@@ -550,7 +535,7 @@ export default class Index extends Vue {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 
-    > i {
+    >i {
       width: 56px;
       height: 4px;
       background: #cfd2db;
@@ -562,7 +547,8 @@ export default class Index extends Vue {
       top: -10px;
       z-index: 3;
     }
-    > div:first-child {
+
+    >div:first-child {
       width: 100%;
       height: 104px;
       overflow-x: scroll;
@@ -572,11 +558,13 @@ export default class Index extends Vue {
       flex-direction: row;
       align-items: center;
       border-bottom: 1px solid #f2f2f2;
+
       .menu-item {
         display: flex;
         flex-direction: column;
         align-items: center;
         margin-right: 30px;
+
         i {
           display: block;
           width: 36px;
@@ -587,10 +575,12 @@ export default class Index extends Vue {
           align-items: center;
           border-radius: 50%;
         }
+
         img {
           width: 24px;
           height: 24px;
         }
+
         span {
           font-size: 12px;
           font-family: PingFang SC, PingFang SC-Regular;
@@ -603,19 +593,23 @@ export default class Index extends Vue {
         }
       }
     }
-    > div:first-child::-webkit-scrollbar {
+
+    >div:first-child::-webkit-scrollbar {
       width: 0;
       display: none;
     }
-    > div:nth-child(2) {
+
+    >div:nth-child(2) {
       // width: 80px;
       height: 284px;
       display: flex;
       flex-direction: row;
       margin-top: 12px;
       padding-bottom: 30px;
+
       .left {
         overflow-y: scroll;
+
         .town {
           width: 80px;
           height: 36px;
@@ -627,46 +621,56 @@ export default class Index extends Vue {
           color: #b1b1b5;
           line-height: 36px;
         }
+
         .town-active {
           background: #f2f4f9;
           color: #3e68ff;
         }
       }
+
       .left::-webkit-scrollbar {
         width: 0;
         display: none;
       }
+
       .right {
         width: 295px;
         height: 284px;
         padding-bottom: 30px;
         overflow-y: scroll;
+
         .scenic-item {
           display: flex;
           margin-bottom: 12px;
           padding-left: 8px;
-          > img {
+
+          >img {
             width: 80px;
             height: 60px;
             margin-right: 8px;
             border-radius: 2px;
           }
+
           .info {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: flex-start;
-            > p:first-child {
+
+            >p:first-child {
               color: #444444;
             }
-            > p:last-child {
+
+            >p:last-child {
               display: flex;
               width: 162px;
+
               img {
                 width: 14px;
                 height: 14px;
                 margin-right: 2px;
               }
+
               span {
                 display: block;
                 width: 162px;
@@ -685,20 +689,24 @@ export default class Index extends Vue {
           }
         }
       }
+
       .right::-webkit-scrollbar {
         width: 0;
         display: none;
       }
     }
+
     .active-menu-item {
       i {
         background: #3e68ff;
       }
+
       span {
         color: #3e68ff;
       }
     }
   }
+
   .bottom-menu-active {
     bottom: 0;
   }

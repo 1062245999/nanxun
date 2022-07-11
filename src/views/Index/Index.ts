@@ -45,6 +45,7 @@ export interface PointBos {
   showZoom: number;
   sort: number;
   isDetails?: number;
+  waterBOS?: [];
 }
 
 export function initDataFn(res?: InitData) {
