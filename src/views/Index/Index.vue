@@ -98,8 +98,7 @@ export default class Index extends Vue {
   active_town: number = 0; // 当前选中的城镇
   filter_point: PointBos[] = []; // 底部列表中的点位;
   img_style: string = "margin: 0 auto 1.067vw;";
-  water_line_list: any = []; // 含有水流路线的水域列表
-  water_line_layer_list: any = []; // 水流polyLine列表
+  water_line: any = null;
   // 定位到当前位置
   moveCenter() {
     const lng = sessionStorage.getItem("lng");
@@ -131,7 +130,7 @@ export default class Index extends Vue {
     if (index === 0) {
       this.line_detail_modal_class_name = "";
     }
-    this.info_window.close();
+    this.info_window?.close();
   }
   // 通过点聚合渲染marker点
   async showMarker() {
@@ -211,12 +210,14 @@ export default class Index extends Vue {
           }
         );
         await this.showMarker();
-        this.info_window.close();
+        this.info_window?.close();
       }
     }
   }
   // 点击底部弹窗的景点
   async clickPoint(item: PointBos) {
+    this.water_line ? this.map.remove(this.water_line) : '';
+    this.water_line = null;
     this.map.setZoomAndCenter(this.init_data.scenicBO.maxZoom, [
       item.longitude,
       item.latitude,
@@ -230,6 +231,30 @@ export default class Index extends Vue {
       this.active_marker.longitude,
       this.active_marker.latitude,
     ]);
+    if (item.pointTypeId === 7 && item?.waterBOS?.length) {
+      const path = item.waterBOS.map((waterBOS_item: any) => {
+        return [waterBOS_item.longitude, waterBOS_item.latitude];
+      });
+      this.water_line = new this.AMap.Polyline({
+        path,
+        isOutline: true,
+        outlineColor: 'white',
+        borderWeight: 3,
+        strokeColor: "#4A93FF",
+        strokeOpacity: 1,
+        strokeWeight: 6,
+        // 折线样式还支持 'dashed'
+        strokeStyle: "solid",
+        lineJoin: 'round',
+        lineCap: 'round',
+        zIndex: 50,
+      });
+      this.map.add(this.water_line);
+      const marker = new this.AMap.Marker({
+        position: [item.longitude, item.latitude],
+      });
+      this.map.setFitView([this.water_line, marker], false, [50, 300, 150, 60]);
+    }
   }
   // 当点击地图上的marker点位时
   clickMarker(context: any) {
@@ -357,32 +382,7 @@ export default class Index extends Vue {
     this.cluster.setData();
     this.getClusterMarkerList();
     await this.showMarker();
-    // 如果当前选中的active-menu为7，也就是水域，那么就在地图上绘制线形覆盖物
-    if (this.active_menu === 7) {
-      this.water_line_list.forEach((water_line_item: any) => {
-        const line_path = water_line_item.waterBOS?.map((item: any) => {
-          return [item.longitude, item.latitude];
-        });
-        var polyline = new this.AMap.Polyline({
-          path: line_path,
-          isOutline: true,
-          outlineColor: 'white',
-          borderWeight: 3,
-          strokeColor: "#4A93FF",
-          strokeOpacity: 1,
-          strokeWeight: 6,
-          // 折线样式还支持 'dashed'
-          strokeStyle: "solid",
-          lineJoin: 'round',
-          lineCap: 'round',
-          zIndex: 50,
-        });
-        this.water_line_layer_list.push(polyline);
-      });
-      this.map.add(this.water_line_layer_list);
-    } else {
-      this.map.remove(this.water_line_layer_list);
-    }
+
     this.map.setFitView(null, false, [50, 100, 150, 60]);
   }
   async touchmove(e: any) {
@@ -403,13 +403,14 @@ export default class Index extends Vue {
     const res = await initData();
     await this.getStreet();
     this.init_data = initDataFn(res.data);
+    this.init_data.pointTypeBOS.sort((a, b) => a.sort - b.sort);
     this.init_data.pointTypeBOS.unshift({
       id: 0,
       pic: all_icon,
       picIn: all_icon_select,
       name: "全部",
+      sort: 0,
     } as any);
-    this.water_line_list = this.init_data.pointBOS.filter((item: any) => item.waterBOS?.length > 0);
     await this.initMap();
     await this.getGeolocation();
     this.init_data.pointBOS.forEach((item: any) => {
@@ -426,7 +427,7 @@ export default class Index extends Vue {
     (window as any).jumpMap = this.jumpMap;
   }
   async closeWindow() {
-    this.info_window.close();
+    this.info_window?.close();
     this.cluster_marker_list = [];
     this.cluster.setData();
     this.getClusterMarkerList();
