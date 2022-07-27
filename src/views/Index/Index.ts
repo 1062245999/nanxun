@@ -44,6 +44,7 @@ export interface PointBos {
   pointTypeId: number;
   showZoom: number;
   sort: number;
+  distance: number;
   isDetails?: number;
   waterBOS?: [];
 }

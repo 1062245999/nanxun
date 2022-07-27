@@ -36,7 +36,7 @@
                   ? item.id === active_marker.id
                   : '',
               }" style="margin-top: 8px">
-                距您{{ item.distance }}
+                距您{{ item.distance / 10000 }}km
               </p>
               <p>
                 <template v-if="item.isDetails">
@@ -359,7 +359,7 @@ export default class Index extends Vue {
           this.active_marker.name)
         })">导航</span>
         </div>
-        <span style="font-size: 12px;color: #848484;margin-top: 6px;">距您123km</span>
+        <span style="font-size: 12px;color: #848484;margin-top: 6px;">距您${this.filter_point.filter((item) => item.id === this.active_marker.id)[0].distance / 10000}km</span>
       </div>`);
       this.info_window.setOffset(new this.AMap.Pixel(0, -40));
     }
@@ -484,11 +484,13 @@ export default class Index extends Vue {
       }
     });
     function onComplete(data: any) {
+      console.log('成功了');
       // data是具体的定位信息
       sessionStorage.setItem("lng", data.position.lng);
       sessionStorage.setItem("lat", data.position.lat);
     }
     function onError(data: any) {
+      console.log('失败了');
       sessionStorage.setItem("lng", that.map.getCenter().lng);
       sessionStorage.setItem("lat", that.map.getCenter().lat);
     }

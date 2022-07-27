@@ -11,8 +11,11 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/',
-    name: 'inedx',
+    name: 'index',
     component: Index,
+    meta: {
+      keepalive: true
+    }
   },
   {
     path: '/scenic-detail',
