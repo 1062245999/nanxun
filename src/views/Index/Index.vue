@@ -139,7 +139,7 @@ export default class Index extends Vue {
       this.map,
       this.cluster_marker_list,
       {
-        gridSize: 60,
+        gridSize: 80,
         renderMarker: function (context: any) {
           context.marker.setContent(that.getMarkerDom(context).marker_content);
           context.marker.setOffset(new that.AMap.Pixel(-36, -33));
@@ -335,7 +335,7 @@ export default class Index extends Vue {
           <img src="${this.base_url}${this.active_marker.pic
         }"  style="width: 56px;height: 56px;border-radius: 2px;margin-right: 8px;"/>
           <div style="display: flex;flex-direction: column;justify-content:space-between;">
-            <p style="margin-bottom: 4px;text-align: left;font-size: 14;font-weight: 500;color: #444">${this.active_marker.name
+            <p style="width: 150px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;margin-bottom: 4px;text-align: left;font-size: 14;font-weight: 500;color: #444">${this.active_marker.name
         }</p>
             <p style="font-size: 12px;color: #848484;text-align: left;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden;">${this.active_marker.synopsis.slice(
           0,
@@ -661,7 +661,12 @@ export default class Index extends Vue {
             align-items: flex-start;
 
             >p:first-child {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              width: 180px;
               color: #444444;
+              text-align: left;
             }
 
             >p:last-child {

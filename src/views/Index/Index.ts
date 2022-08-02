@@ -77,7 +77,7 @@ export const box_style =
 export const img_style =
   "margin: 0 auto 1.067vw;";
 export const text_style =
-  "white-space:nowrap;font-size: 3.733vw;line-height: 6.667vw;text-align: center;padding: 0 10px;background: white;height: 30px;line-height:30px;border-radius: 8px";
+  "white-space:nowrap;font-size: 14px;line-height: 6.667vw;text-align: center;padding: 0 5px;background: white;height: 22px;line-height:22px;border-radius: 8px";
 export const infoWindowStyle: string = `width: 62.933vw;height: 18.133vw;position:relative;display: flex;flex-direction: row;background: red;background: white;padding: 2.133vw;border-radius: 1.067vw;`;
 
 export interface StreetData {
