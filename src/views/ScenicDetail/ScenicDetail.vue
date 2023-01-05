@@ -54,19 +54,32 @@ export default class ScenicDetail extends Vue {
   jumpMap(target_lng: number, target_lat: number, name: string) {
     const lng: any = sessionStorage.getItem("lng");
     const lat: any = sessionStorage.getItem("lat");
-    let url =
-      "http://uri.amap.com/navigation?from=" +
-      lng +
-      "," +
-      lat +
-      ",我的位置&to=" +
-      target_lng +
-      "," +
-      target_lat +
-      "," +
-      name +
-      "&mode=car&policy=1&src=mypage&coordinate=gaode&callnative=0";
-    window.location.href = url;
+    var ua = navigator.userAgent.toLowerCase();
+    if ((ua.match(/MicroMessenger/i) as any) == 'micromessenger') {
+      //在微信就用微信地图
+      (this as any).openLocation({
+        name: name, // 位置名
+        latitude: target_lat, // 纬度，浮点数，范围为90 ~ -90
+        longitude: target_lng, // 经度，浮点数，范围为180 ~ -180。
+        address: '', // 地址详情说明
+        scale: 12, // 地图缩放级别,整形值,范围从1~28。默认为最大
+        infoUrl: '', // 在查看位置界面底部显示的超链接,可点击跳转
+      });
+    } else {
+      let url =
+        'http://uri.amap.com/navigation?from=' +
+        lng +
+        ',' +
+        lat +
+        ',我的位置&to=' +
+        target_lng +
+        ',' +
+        target_lat +
+        ',' +
+        name +
+        '&mode=car&policy=1&src=mypage&coordinate=gaode&callnative=0';
+      window.location.href = url;
+    }
   }
   back() {
     this.$router.back();
